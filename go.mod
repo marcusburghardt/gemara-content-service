@@ -1,8 +1,6 @@
 module github.com/complytime/gemara-content-service
 
-go 1.24.0
-
-toolchain go1.24.5
+go 1.25.9
 
 require (
 	github.com/coreos/go-oidc/v3 v3.17.0
