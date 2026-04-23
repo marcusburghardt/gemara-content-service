@@ -56,7 +56,7 @@ func NewJWTAuth(ctx context.Context, config JWTAuthConfig) (*JWTAuth, error) {
 		k8sConfig.Dial = func(ctx context.Context, network, address string) (net.Conn, error) {
 			forcedAddress := net.JoinHostPort(kubernetesServiceIP, "443")
 
-			slog.Debug("DNS bypass intercepted connection", "original_addr", address, "forced_addr", forcedAddress)
+			slog.Debug("DNS bypass intercepted connection", "original_addr", address, "forced_addr", forcedAddress) //nolint:gosec // G706 - structured slog attributes prevent log injection
 
 			dialer := &net.Dialer{
 				Timeout:   15 * time.Second,

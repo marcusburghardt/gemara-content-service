@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -100,16 +101,23 @@ func NewMapperSet(config *Config) (mapper.Set, error) {
 
 func NewMapperFromDir(pluginID mapper.ID, evaluationsPath string) (mapper.Mapper, error) {
 	mpr := factory.MapperByID(pluginID)
-	err := filepath.Walk(evaluationsPath, func(path string, info os.FileInfo, err error) error {
+
+	root, err := os.OpenRoot(evaluationsPath)
+	if err != nil {
+		return mpr, fmt.Errorf("opening root directory %s: %w", evaluationsPath, err)
+	}
+	defer root.Close()
+
+	err = fs.WalkDir(root.FS(), ".", func(relPath string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if info.IsDir() {
+		if d.IsDir() {
 			return nil
 		}
 
-		content, err := os.ReadFile(path)
+		content, err := root.ReadFile(relPath)
 		if err != nil {
 			return err
 		}
